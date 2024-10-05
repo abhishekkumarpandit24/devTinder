@@ -2,21 +2,44 @@ const express = require("express");
 
 const app = express();
 
-// GET /users => it checks all the app.xxx('matching route") functions
+const { adminAuth, userAuth } = require("./middlewares/auth");
 
-app.use("/", (req, res, next) => {
-    next();
-})
+// Handle auth middleware for all requests having admin
+app.use("/admin", adminAuth)
 
-// this will only handle GET call to /user
-app.get("/user", (req, res, next) => {
-    // res.send("Route handler 1")
-    next();
-}, (req, res, next) => {
-    // res.send("2nd response")
-    next();
-}, (req, res, next) => {
-    res.send("3rd route handler")
+app.post("/user/login", (req, res) => {
+    res.send("User logged in successfully!");
+});
+
+app.get("/user", userAuth, (req, res) => {
+    res.send("User Data Sent");
+});
+
+app.get("/admin/getAllData", (req, res) => {
+    // check if the request is authorised
+    // Now don't need this 
+    // const token = "xyz" || req.body?.token;
+    // const isAdminAuthorized = token === "xyz";
+    // if(isAdminAuthorized) {
+    // res.send("All Data sent");
+    // } else {
+    //     res.status(401).send("Not authorised!")
+    // }
+    res.send("All Data sent");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+    // check if the request is authorised
+    // const token = "xyz" || req.body?.token;
+    // const isAdminAuthorized = token === "xyz";
+    // if(isAdminAuthorized) {
+    //     res.send("Delete a user");
+
+    // } else {
+    //     res.status(401).send("Not authorised!")
+    // }
+    res.send("Delete a user");
+
 });
 
 app.listen(4000, () => {
