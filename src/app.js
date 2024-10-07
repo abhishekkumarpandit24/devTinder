@@ -45,6 +45,29 @@ try {
 }catch (err){
     res.status(400).send('Something went wrong!')
 }
+});
+
+app.delete('/user', async (req, res) => {
+    const userId = req.body.userId;
+    try {
+    //    const user = await User.findByIdAndDelete({ _id: userId })
+       const user = await User.findByIdAndDelete(userId)
+        res.status(200).send("user deleted successfully!");
+    } catch (err){
+        res.status(400).send('Something went wrong!')
+    }
+});
+
+// update data of the user
+app.patch('/user', async(req, res) => {
+    const userId = req.body.userId;
+    const data = req.body;
+    try {
+        const user = await User.findByIdAndUpdate({ _id: userId }, data);
+        res.send('User updated Successfully!')
+    } catch (err){
+        res.status(400).send('Something went wrong!');
+    }
 })
 
 connectDB().then(() => {
