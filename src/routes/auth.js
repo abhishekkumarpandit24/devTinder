@@ -26,7 +26,23 @@ authRouter.post("/signup", async (req, res) => {
         });
 
         await user.save();
-        res.send("User added sucessfully!");
+
+        // Automatically log the user in (generate JWT token)
+        const token = await user.getJWT();
+
+        // Set token in cookies
+        res.cookie('token', token, {
+            expires: new Date(Date.now() + 8 * 3600000), // Expires in 8 hours
+            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+            secure: process.env.NODE_ENV === 'production' // Only send the cookie over HTTPS in production
+        });
+
+        // Send response with token and user information
+        res.send({
+            message: "User added successfully and logged in!",
+            accessToken: token,
+            user
+        });
 
     } catch (err) {
         console.log(err)
@@ -53,7 +69,11 @@ authRouter.post('/login', async (req, res) => {
             res.cookie('token', token, {
                 expires: new Date(Date.now() + 8 * 3600000)
             })
-            res.send("Login Successfull!");
+            res.send({
+                message: "Logged In",
+                accessToken: token,
+                user
+            });
         } else {
             throw new Error(" Invalid credentials")
         }
@@ -70,6 +90,7 @@ authRouter.post("/logout", async (req, res) => {
     } catch (err) {
         res.status(400).send("ERROR: " + err.message)
     }
-})
+});
+
 
 module.exports = authRouter;
